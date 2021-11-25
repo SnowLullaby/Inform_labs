@@ -1,4 +1,10 @@
-words = ["ty<>pe", "time", "evenWeek", "class", "building", "subject", "teacher", "lessonFormat"]
+"""
+Основное задание лабораторной работы №4
+Версия от 13:20 25.11
+
+"""
+
+words = ["type", "time", "evenWeek", "class", "building", "subject", "teacher", "lessonFormat"]
 
 
 def fined_word(line, key_end_idx): # ищем значение
@@ -32,8 +38,10 @@ def get_indexes_of_escaped(string):  # вот тут ищем индексы э�
 
 
 def del_escaped_from_key(key_string):  # удаляем все \ и экраннированные символы из ключа и все исключения
-    new_key = key_string[0]
-    for i in range(1, len(key_string)):
+    j = 0
+    while key_string[j] == "\\": j += 1
+    new_key = key_string[j]
+    for i in range(j+1, len(key_string)):
         if key_string[i] != "\\" and key_string[i - 1] != "\\":
             new_key += key_string[i]
     replacement_symbols = {"<": "", ">": "", '"': ""}
@@ -70,6 +78,7 @@ def parse_file(file):  # основная функция для парсинга
 
         counter_tt += line.count("{") - line.count("}") - key_string.count("{") + key_string.count("}")
         counter_les += line.count("[") - line.count("]") - key_string.count("[") + key_string.count("]")
+        
         if has_value:
             counter_tt += - fined_word(line, key_end_idx).count("{") + fined_word(line, key_end_idx).count("}")
             counter_les += - fined_word(line, key_end_idx).count("[") + fined_word(line, key_end_idx).count("]")
@@ -136,26 +145,24 @@ def file_to_xml(file):
 
 def prepare_file(file):
     lines = file.readlines()
+    line = " ".join(lines)
     new_file = []
-    for line in lines:
-        count_qm = 0
-        key_start_idx = 0
-        st_idx = 0
-
-        if '"' in line:
-            for i in range(len(line)):
-                if line[i] == '"' and count_qm == 0:
-                    count_qm += 1
-                    key_start_idx = i
-                    break
-            for i in range(key_start_idx + 1, len(line)):
-                if line[i] == '"' and line[i - 1] != "\\":
-                    count_qm += 1
-                if (line[i] == '{' or line[i] == '[' or line[i] == ',') and count_qm % 2 == 0:
-                    end_idx = i
-                    new_file.append(line[st_idx: end_idx + 1])
-                    st_idx = i + 1
-
+    count_qm = 0
+    key_start_idx = 0
+    st_idx = 0
+    if '"' in line:
+        for i in range(len(line)):
+            if line[i] == '"' and count_qm == 0:
+                count_qm += 1
+                key_start_idx = i
+                break
+        for i in range(key_start_idx + 1, len(line)):
+            if line[i] == '"' and line[i - 1] != "\\":
+                count_qm += 1
+            if (line[i] == '{' or line[i] == '[' or line[i] == ',' or line[i] == '}' or line[i] == ']') and count_qm % 2 == 0:
+                end_idx = i
+                new_file.append(line[st_idx: end_idx + 1])
+                st_idx = i + 1
         new_file.append(line[st_idx:])
     return new_file
 
