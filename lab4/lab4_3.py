@@ -1,3 +1,9 @@
+"""
+Дополнительное задание №2 к лабораторной работе №4
+Версия от 13:40 25.11
+
+"""
+
 import re
 words = ["type", "time", "evenWeek", "class", "building", "subject", "teacher", "lessonFormat"]
 
@@ -121,25 +127,24 @@ def file_to_xml(file):
 
 def prepare_file(file):
     lines = file.readlines()
+    line = " ".join(lines)
     new_file = []
-    for line in lines:
-        count_qm = 0
-        key_start_idx = 0
-        st_idx = 0
-
-        if '"' in line:
-            for i in range(len(line)):
-                if line[i] == '"' and count_qm == 0:
-                    count_qm += 1
-                    key_start_idx = i
-                    break
-            for i in range(key_start_idx + 1, len(line)):
-                if line[i] == '"' and line[i - 1] != "\\":
-                    count_qm += 1
-                if (line[i] == '{' or line[i] == '[' or line[i] == ',') and count_qm % 2 == 0:
-                    end_idx = i
-                    new_file.append(line[st_idx: end_idx + 1])
-                    st_idx = i + 1
+    count_qm = 0
+    key_start_idx = 0
+    st_idx = 0
+    if '"' in line:
+        for i in range(len(line)):
+            if line[i] == '"' and count_qm == 0:
+                count_qm += 1
+                key_start_idx = i
+                break
+        for i in range(key_start_idx + 1, len(line)):
+            if line[i] == '"' and line[i - 1] != "\\":
+                count_qm += 1
+            if (line[i] == '{' or line[i] == '[' or line[i] == ',' or line[i] == '}' or line[i] == ']') and count_qm % 2 == 0:
+                end_idx = i
+                new_file.append(line[st_idx: end_idx + 1])
+                st_idx = i + 1
 
         new_file.append(line[st_idx:])
     return new_file
